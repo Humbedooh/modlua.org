@@ -1,0 +1,48 @@
+Setting up mod_lua
+<h2>Setting up mod_lua</h2>
+<p>
+    Welcome to a very small document! It is entirely on purpose. This document assumes you have
+    already installed and enabled mod_lua. If you haven't done so yet, <a href="/gs/installing">Click here</a>
+    to read about how you do that.
+</p>
+
+<p>
+    Setting up mod_lua doesn't require a whole lot of work, in fact it pretty much runs out of the box.
+    If all you wish is to run .lua scripts as web applications, then you need only follow the steps
+    outlined in the "<a href="/gs/apps">Getting started with web apps</a>" document and you're all set.
+    If you are interested in working with hooks, follow the guide in "<a href="/gs/hooks">Getting started
+    with hooks</a>" document. For filters, check out the "<a href="/filters/intro">Filters introduction</a>".
+</p>
+
+<p>
+    You may want to check out the "<a href="/gs/tweaking">Tweaking mod_lua</a>" document to see how to
+    increase the performance of mod_lua, as well as learn about some considerations to make when
+    using mod_lua for hooks or web apps.
+</p>
+
+<h3>Setting the root of all Lua scripts used in hooks/filters</h3>
+<p>
+    If all your scripts for hooks/filters are placed in the same folder - let's say <kbd>/etc/lua/scripts</kbd> -
+    then you can avoid having to type the full url every time you configure a hook/filter by using the
+    <code>LuaScope</code> directive. This directive sets the root path from which all LuaHook* directives
+    are evaluated. Consider the following:
+</p>
+
+<pre class="prettyprint lang-config">
+LuaHookTranslateName /etc/lua/scripts/translate.lua translate_name
+LuaHookMapToStorage /etc/lua/scripts/mapper.lua map
+LuaOutputFilter ExampleFilter /etc/lua/scripts/filter.lua output_filter
+</pre>
+
+<p>With <kbd>LuaRoot</kbd> set, you can shorten these lines a bit:</p>
+
+<pre class="prettyprint lang-config">
+LuaRoot /etc/lua/scripts/
+LuaHookTranslateName translate.lua translate_name
+LuaHookMapToStorage mapper.lua map
+LuaOutputFilter ExampleFilter filter.lua output_filter
+</pre>
+
+<p>
+    <a href="/gs/tweaking" class="btn btn-large btn-primary">Next: Tweaking mod_lua</a> &nbsp;
+</p>

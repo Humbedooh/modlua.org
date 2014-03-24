@@ -1,0 +1,32 @@
+Input filters
+<h2 id='116089'> Input filters with mod_lua:</h2>
+The following applies an input filter to all requests to a <code>.html</code> file:
+<pre class='highlight prettyprint lang-config'>
+LuaInputFilter /path/to/filter.lua myInputFilter
+&lt;FilesMatch "\.html$"&gt;
+  SetInputFilter myInputFilter
+&lt;/FilesMatch&gt;
+</pre>
+
+<h3 id='93045'> An example input filter: stripping away bad sentences</h3>
+<br/>
+Add the following to httpd.conf:
+<pre class='highlight prettyprint lang-config'>
+LuaInputFilter LuaHackChecker /path/to/antihack.lua hack_checker
+&lt;Files "upload.php"&gt;
+  SetInputFilter LuaHackChecker
+&lt;/Files&gt;
+</pre>
+<br/>
+<h4 id='76979'> antihack.lua:</h4>
+<pre class='highlight prettyprint lang-lua'>
+function hack_checker(r)
+  coroutine.yield()
+  while bucket ~= nil do
+    if bucket:match("&lt;%?php") then
+       bucket = bucket:gsub("&lt;%?", "&amp;lt;?")
+    end
+    coroutine.yield(bucket)
+  end
+end
+</pre>

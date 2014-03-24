@@ -1,0 +1,40 @@
+Working with cookies
+<h2>Working with cookies in mod_lua</h2>
+
+<p> Working with cookies can be a bit tricky in mod_lua on httpd 2.4.6 and below.
+    Luckilly, here's a recipe for working with them:
+</p>
+
+<pre class="prettyprint lang-lua">
+function setCookie(r, key, value)
+    r.headers_out['Set-Cookie'] = ("%s=%s;"):format(key, value)
+end
+
+function getCookie(r, key)
+    local value = (r.headers_in['Cookie'] or ""):match(key .. "=([^;]+)") or ""
+    return value
+end
+
+</pre>
+
+<p>
+    With the introduction of <a href="/api/builtin#getcookie">r:getcookie</a> and <a href="/api/builtin#setcookie">r:setcookie</a>
+    in the new 2.4.7 and further advancements in 2.4.8, working with cookies has gotten quite a bit easier:
+</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    local cookie = r:getcookie("foo")
+    if not cookie then
+        cookie = r:sha1(math.random(1, os.time()))
+        r:setcookie{
+            key = "foo",
+            value = cookie,
+            secure = true
+        }
+    end
+    r.content_type = "text/plain"
+    r:puts("Your cookie is: ", cookie)
+    return apache2.OK
+end
+</pre>

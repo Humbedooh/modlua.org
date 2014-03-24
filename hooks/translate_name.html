@@ -1,0 +1,187 @@
+Name translation hooks
+<h2>Name translation hooks</h2>
+
+<p> The name translation phase in httpd is where a URI gets translated into a file path in the file system. It doesn't get mapped yet (the
+<a href="/hooks/map_to_storage">map-to-storage</a> phase handles this),
+but, for instance, <code>/foo.php/bar</code> would get translated into <code>/var/www/foo.php</code>.</p>
+<p>With mod_lua hooks, we can use this phase to translate URIs into whatever we like, much like how <kbd>mod_rewrite</kbd> or <kbd>mod_alias work</kbd>.</p>
+
+<p>
+    Let's look at how we could translate a URI into a specific file system path:
+</p>
+<pre class="prettyprint lang-config">
+LuaHookTranslateName /path/too/foo.lua remap
+</pre>
+
+
+<pre class="prettyprint lang-lua">
+--[[
+    Simple remap example.
+    This example will rewrite /foo/test.bar to the physical file
+    /internal/test, somewhat like how mod_alias works.
+]]--
+
+function remap(r)
+    -- Test if the URI matches our criteria
+    local barFile =  r.uri:match("/foo/([a-zA-Z0-9]+)%.bar")
+    if barFile then
+        r.filename = "/internal/" .. barFile
+    end
+    return apache2.OK
+end
+</pre>
+
+<p>
+    The advantage of using mod_lua for this is that we can apply simple business logic to our translations, that <kbd>mod_rewrite</kbd>
+    would not be able to. In the example below, we'll compare some URIs and either map them locally or proxy them to a backend, based
+    on a Lua table with configurations:
+</p>
+
+<pre class="prettyprint lang-lua">
+--[[
+    Advanced remap example.
+    This example will evaluate some conditions, and based on that, 
+    remap a file to one of two destinations, using a rewrite map.
+    This is similar to mixing AliasMatch and ProxyPass, but 
+    without them clashing in any way. Assuming we are on example.com, then:
+
+    http://example.com/photos/test.png will be rewritten as /uploads/www/test.png
+    http://example.com/ext/foo.html will be proxied to http://www.external.com/foo.html
+    URIs that do not match, will be served by their respective default handlers
+]]--
+
+local map = {
+      photos = {   
+                   source = [[^/photos/(.+)\.png$]], 
+                   destination = [[/uploads/www/$1.png]],
+                   proxy = false
+                },
+      externals = {
+                   source = [[^/ext/(.*)$]],
+                   destination = [[http://www.external.com/$1]],
+                   proxy = true
+                }
+}
+
+function interpolateString(s,v)
+    return s:gsub("%$(%d+)", function(a) return v[tonumber(a)] end)
+end
+        
+function remap(r)
+    -- browse through the rewrite map
+    for key, entry in pairs(map) do
+        -- Match source regex against URI
+        local match = r:regex(r.uri, entry.source) then
+        if match and match[0] then
+            r.filename = interpolateString(entry.destination, match)
+            -- Is this a proxied remap?
+            if entry.proxy then
+                r.handler = "proxy-server" -- tell mod_proxy to handle this
+                r.proxyreq = apache2.PROXYREQ_REVERSE -- We'll want to do a reverse proxy
+                r.filename = "proxy:" .. r.filename -- Add the proxy scheme to the destination
+            end
+            return apache2.OK
+        end
+    end
+    return apache2.DECLINED
+end
+</pre>
+
+
+<p>
+    As with simple and advanced rewriting, you can use mod_lua for dynamically 
+    assigning a hostname to a specific document root, much like 
+    <code class="module"><a href="http://httpd.apache.org/docs/mod/mod_vhost_alias.html">mod_vhost_alias</a></code> does, but with more control over what goes 
+    where. This could be as simple as a table holding the information about which 
+    host goes into which folder, or more advanced, using a database holding the 
+    document roots of each hostname.
+</p>
+
+<pre class="prettyprint lang-config">
+LuaHookTranslateName /path/too/foo.lua mass_vhost
+</pre>
+
+
+
+
+<pre class="prettyprint lang-lua">
+--[[
+    Simple mass vhost script
+    This example will check a map for a virtual host and rewrite filename and 
+    document root accordingly.
+]]--
+
+local vhosts = {
+    { domain = "example.com", home = "/www/example.com" },
+    { domain = "example.org", home = "/nfs/ext1/example.org" }
+}
+
+function mass_vhost(r)
+    -- Match against our hostname
+    for key, entry in pairs(vhosts) do
+        -- match against either host or *.host:
+        if r:strcmp_match(r.hostname, entry.domain) or
+           r:strcmp_match(r.hostname, "*." .. entry.domain) then
+            -- If it matches, rewrite filename and set document root
+            local filename = r.filename:sub(r.document_root:len()+1)
+            r.filename = entry.home .. filename
+            r:set_document_root(entry.home)
+            return apache2.OK
+        end
+    end
+    return apache2.DECLINED
+end
+</pre>
+
+
+<p> Or, if you want a really advanced example, let's look at how you can use a MySQL database to store virtual hosts
+    for mass vhosting:</p>
+
+
+
+
+<pre class="prettyprint lang-lua">
+--[[
+    Advanced mass virtual hosting
+    This example will query a database for vhost entries and save them for
+    60 seconds before checking for updates. For best performance, such scripts
+    should generally be run with LuaScope set to 'thread' or 'server'
+]]--
+
+local cached_vhosts = {}
+local timeout = 60
+
+-- Function for querying the database for saved vhost entries
+function query_vhosts(r)
+    local host = r.hostname
+    if not cached_vhosts[host] or (cached_vhosts[host] and cached_vhosts[host].updated &lt; os.time() - timeout) then
+        local db,err = ap.dbopen(r,"mod_dbd")
+        local _host = db:escape(r,host)
+        local res, err = db:query(r, ("SELECT `destination` FROM `vhosts` WHERE `hostname` = '%s' LIMIT 1"):format(_host) )
+        if res and #res == 1 then
+            cached_vhosts[host] = { updated = os.time(), destination = res[1][1] }
+        else
+            cached_vhosts[host] = { updated = os.time(), destination = nil } -- don't re-query whenever there's no result, wait a while.
+        end
+        db:close()
+    end
+    if cached_vhosts[host] then 
+        return cached_vhosts[host].destination
+    else
+        return nil
+    end
+end
+        
+function mass_vhost(r)
+    -- Check whether the hostname is in our database
+    local destination = query_vhosts(r)
+    if destination then
+        -- If found, rewrite and change document root
+        local filename = r.filename:sub(r.document_root:len()+1)
+        r.filename = destination .. filename
+        ap.set_document_root(r,destination)
+        return apache2.OK
+    end
+    return apache2.DECLINED
+end
+</pre>

@@ -1,0 +1,47 @@
+Storage mapping
+<h2>Storage mapping hooks with mod_lua</h2>
+<p>
+    The map-to-storage phase of a request is where a propsed file system path gets mapped to its physical address.
+    When a URL is translated in the <a href="/hooks/translate_name">Name translation</a> phase, it turns from, for instance,
+    <kbd>/foo.lua</kbd> to <kbd>/var/www/foo.lua</kbd>. In this phase, that file system path is mapped to its physical location
+    on the server. In most cases, this will simply be <kbd>/var/www/foo.lua</kbd>, but if you had a caching module enabled, it
+    might object and say <em>"Hey, I actually put a cached copy of this somewhere else (or in memory)"</em> and change the way
+    the request is handled. Modules that use this phase are typically caching modules or proxy modules (if you proxy, then you map
+    from a physical to an external location, for instance).
+</p>
+
+<h3>A simple caching module in Lua</h3>
+<p>Let's look at how we could implement caching with mod_lua that caches .html files:</p>
+<pre class="prettyprint lang-config">
+# httpd.conf:
+LuaHookMapToStorage /etc/lua/scripts/mapper.lua map_function
+</pre>
+
+<pre class="prettyprint lang-lua">
+function map_function(r)
+    -- Is the client requesting a .html file?
+    if r.filename:match("%.html$") then
+        -- First, we see if we have a cached version of the file available
+        local cache_id = "cache:" .. r.filename - construct a cache ID
+        local file = r:ivm_get(cache_id)
+        if not file then
+            local f = io.open(r.filename)
+            if f then
+                file = f:read("*a")
+                f:close()
+            end
+        end
+        if file then
+            r.content_type = "text/html" -- set output to text/html
+            r.status = 200 -- set a 200 status code (OK)
+            r.handler = "mod_lua_cache" -- we handled this
+            r:write(file) -- send the contents to the client
+            return apache2.OK
+        else
+            return 404 -- file not found :(
+        end
+    else
+        return apache2.DECLINED -- not a .html file, this hook will pass on the request to the other handlers
+    end
+end
+</pre>

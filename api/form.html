@@ -1,0 +1,118 @@
+Working with form data
+<h2>Working with form data in mod_lua</h2>
+
+<p>
+Like most other web frameworks, mod_lua distinguishes between <code>GET</code> and <code>POST</code> data. 
+The method for obtaining these two sets of data are different, but the result is the same. Let's start by 
+looking at how to obtain GET data using <a href="/api/builtin#parseargs">r:parseargs</a>:
+</p>
+
+<pre class="prettyprint lang-html">
+&lt;!-- foo.html --&gt;
+&lt;form action="foo.lua" method="GET"&gt;
+    &lt;b>Your name:&lt;/b&gt;
+    &lt;input type="text" name="name" size="20"/&gt;
+    &lt;input type="submit" value="Send request" /&gt;
+&lt;/form>
+</pre>
+
+<pre class="prettyprint lang-lua">
+-- foo.lua:
+function handle(r)
+    local GET = r:parseargs() -- parse the GET data and return it as key/value pairs.
+    local myName = GET['name'] or "Anonymous" -- Get the 'name' variable, or fall back to 'Anonymous'.
+    r:puts( ("Hello, %s!"):format(myName) ) -- Say something to the browser
+    return apache2.OK
+end
+</pre>
+
+<p>If you had entered <code>John Doe</code> as the name in the box and clicked on the submit button, you would then 
+be presented with the text <code>Hello, John Doe!</code>. So far so good!
+</p>
+
+<h3>Dealing with multiple values for each key</h3>
+
+<p>But what if you had two identical fields? Odd as it may be, it's not uncommon, as you may, for instance have several 
+check boxes with the same name (for instance, when a user has to pick 3 different options in a group of 20), and with 
+the generic approach, only one of those values would make it to the GET table in mod_lua. To accommodate this, mod_lua
+returns <strong>two</strong> tables instead of one; One with regular key/value pairs for single key, single value elements,
+and one where each value is in fact a list of all the values that the key/value pair has. As such, you can request the URL
+<code>http://mydomain.tld/foo.lua?name=John&name=Foo&name=Bar</code> and have all three values available to you:
+</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    local GET, GETMULTI = r:parseargs() -- Get the regular and the special table
+    local myName = GET['name'] or 'Anonymous' -- What we did before
+    -- Do we have more than one value assigned for the 'name' key?
+    if GETMULTI['name'] and #GETMULTI['name'] > 1 then
+        myName = table.concat(GETMULTI['name'], ", ") -- concat names together
+    end
+    r:puts( ("Hello, %s!"):format(myName) ) -- Say something to the browser
+    return apache2.OK
+end
+</pre>
+
+<p>If we visited the above mentioned URL with the old script, we would be greeted with: <code>Welcome, Bar!</code>.
+If we use the new code, we would now be greeted with: <code>Welcome, John, Foo, Bar!</code> instead. Easy peasy.
+</p>
+
+<h3>Dealing with POST data</h3>
+<p>Dealing with POST data is similar to dealing with GET data, except it requires a different call to mod_lua;
+namely a call to <a href="/api/builtin#parsebody">r:parsebody</a>:</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    local POST, POSTMULTI = r:parsebody() -- Get the regular and the special table from POST data.
+    local myName = POST['name'] or 'Anonymous' -- What we did before
+    -- Do we have more than one value assigned for the 'name' key?
+    if POSTMULTI['name'] and #POSTMULTI['name'] > 1 then
+        myName = table.concat(POSTMULTI['name'], ", ") -- concat names together
+    end
+    r:puts( ("Hello, %s!"):format(myName) ) -- Say something to the browser
+    return apache2.OK
+end
+</pre>
+
+<p>r:parsebody is different in that accepts an optional parameter in the call, limiting the amount of POST data that
+will be parsed. This value has a default of 8KB, and if the limit is exceeded, the POST data will simply be ignored.
+This prevents having to waste CPU cycles parsing, for instance, 1GB of POST data when we know that no form would ever
+contain that much data, or it can be used to limit the size of uploaded files and so on:</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    local POST = r:parsebody(1024*1024) -- Only parse up to 1MB of data
+    if POST['foo'] then
+        r:puts("You entered the 'foo' value!")
+    else
+        r:puts("Please enter a value for 'foo' and keep it below 1MB!")
+    end
+    return apache2.OK
+end
+</pre>
+
+<h3>Dealing with raw data (for instance PUT requests)</h3>
+<p>If you want to just grab all the data that has been sent, without parsing it first, there is a function for that as well,
+called <a href="/api/builtin#requestbody">r:requestbody</a>. It can return the uploaded data as a string, or save the contents
+to a local file:</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    local data
+    local bytes = 0
+    -- option one
+    if load_into_memory then
+        data = r:requestbody() -- Get the entire request body and store it in memory
+        bytes = data:len()
+        
+    -- option two
+    else
+        r:requestbody("/tmp/foo.data") -- Save the uploaded data in a file instead
+        local info = r:stat("/tmp/foo.data") -- get file info
+        bytes = info.size
+    end        
+    r:puts( ("You submitted %u bytes of data to us."):format(bytes) )
+    return apache2.OK
+end
+</pre>
+

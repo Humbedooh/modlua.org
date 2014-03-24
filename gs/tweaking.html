@@ -1,0 +1,125 @@
+Tweaking mod_lua
+<h2>Tweaking mod_lua</h2>
+<p>
+    mod_lua has some particular directives that affect memory and cpu consumption, most notably the <code>LuaScope</code>
+    directive, which controls the creation and destruction of VMs (Virtual Machines). Each hook or web application has its own VM,
+    separated from other scripts, created by default when a script is requested through a URL, either as a hook or as a web app,
+    and destroyed when the request is done. The LuaScope directive allows you to control and tweak the creation of VMs, more specifically
+    the option of retaining a VM, reusing it on the next request, thus saving the time and energy normally spent on creating and destroying
+    a VM, at the cost of increased memory usage. In most cases, this extra memory usage is negligible, as Lua's garbage collector is quite
+    good at its job. If your programming skills are sane, and you don't create any (deliberate) memory leaks, you can gain upwards of a 120%
+    increase in page speed by changing the scope of the Lua VMs.
+</p>
+
+<h3>Setting the right scope</h3>
+<p>
+    The default scope, as said, is the <code>request</code> scope, which means that a VM will be created for your script when a request
+    is initiated, and destroyed when the request is done. For pure testing of various 'unsafe' scripts, this is a good default setting,
+    albeit a slightly slow one. If you are confident in your programming skills, or if you are on a production machine with plenty of RAM
+    and slightly starved of CPU, setting this directive to use the <code>thread</code> or <code>server</code> scope will cause VMs to
+    be reused by new requests, thus removing the time it takes to spin up a new VM on each request. Your scripts will still have an isolated
+    VM, but it will persist through requests, retaining the data accumulated in previous runs (unless the GC collects it, of course).
+</p>
+
+<p>
+    The following LuaScope settings are available:
+</p>
+
+<table class="table table-striped">
+    <tr><th style="width: 80px;">Scope:</th><th>Description:</th></tr>
+    <tr><td><code>once</code></td><td>The VM will be used only once and then destroyed, even if the script is run several times in a request.
+                                        This is the slowest of all settings, performance wise</td></tr>
+    <tr><td><code>request</code></td><td>The VM will be used for the lifetime of a single request.
+                                            If the script is called several times during that request, the VM will be reused, and then destroyed
+                                            when the request is done. This is the default setting</td></tr>
+    <tr><td><code>conn</code></td><td>The VM will be used for the entirity of a connection. If keepalive is in use, then several requests can be made
+                                        within the same VM. This has a moderate performance gain.</td></tr>
+    <tr><td><code>thread</code></td><td>The VM will persist through the lifetime of the processing thread. This will cause a higher memory usage, as
+                                        multiple inactive VMs may be present if you have a lot of different scripts configured/available, but
+                                        is by far the fastest of all options. If you have plenty of RAM (think Megabytes, not Gigabytes), this
+                                        is the preferred option to use.</td></tr>
+    <tr><td><code>server</code></td><td>This option is a pragmatic approach, in which the process itself keeps a pool of VMs that threads can
+                                            acquire, use and release when they are done using them. It has roughly the same speed as the <code>thread</code>
+                                            scope setting, but uses less memory, as you can configure a pool smaller than the number of threads.
+                                            It requires a <code>min</code> and a <code>max</code> setting, which should be lower than the number of
+                                            threads per process.</td></tr>
+</table>
+
+<h3>Some example scopes:</h3>
+
+<p>
+    
+</p>
+
+<pre class="prettyprint lang-config">
+# Create and throw away the VM on each access to a script:
+LuaScope once
+
+# Use a thread scope for optimal performance
+LuaScope thread
+
+# Use a server pool of VMs. We have 100 threads per process, so let's set the pool to 20.
+# This will use at most 20% the memory the 'thread' scope would use.
+# 5 20 means "create 5 VMs to start with, and increase to a maximum of 20 IF NEEDED"
+LuaScope server 5 20
+</pre>
+
+<h3>Managing memory consumption with the server/thread scope</h3>
+
+<p>
+    It may prudent to consider that no matter how well you program, you may end up causing a memory leak.
+    If you are using the <code>thread</code> or <code>server</code> scope for optimal speeds, you should consider
+    setting the <code><a href="http://httpd.apache.org/docs/trunk/mod/mpm_common.html#maxconnectionsperchild">MaxConnectionsPerChild</a></code>
+    directive to a sensible value. This directive will cause a server process to shut down and restart once it has hit a specific
+    number of requests, allowing any memory leaks to be cleaned up. Users of mod_php will probably have happened upon this directive,
+    as it is quite crucial when using mod_php. With mod_lua, it is not as crucial, as memory consumption is considerably lower, but
+    nonetheless, it is a good idea to set this directive to a value above zero, to ensure that <em>should there be a leak</em>, it
+    will be taken care of:
+</p>
+
+<pre class="prettyprint lang-config">
+# Set the process to 'reboot' after having received 50,000 requests
+MaxConnectionsPerChild 50000
+</pre>
+
+<h2>Code caching</h2>
+
+<p>
+    By default, mod_lua will cache scripts in memory for the entirity of a VM. If you have your VM scope set to <kbd>server</kbd> or <kbd>thread</kbd>,
+    this will cause scripts not to update if you change them while httpd is running. This is okay on a production web server,
+    but if you regularly update your scripts on your dev server, you will need to tell mod_lua to reload scripts when they have changed.
+</p>
+
+<p>
+    The reloading of scripts is configured through the <code>LuaCodeCache</code> directive. The following options are available:
+</p>
+<table class="table table-striped">
+    <tr><th>Value</th><th>Description</th></tr>
+    <tr><td><code>never</code></td><td>Never cache scripts, always reload them when accessed. This is a slow performance setting, but may be needed on NFS mounted systems</td></tr>
+    <tr><td><code>always</code></td><td>Always cache scripts forever, never reload them. This is mainly for production web servers where your scrips never change</td></tr>
+    <tr><td><code>stat</code></td><td>This is the optimal setting for a development system. It will run a <kbd>stat()</kbd> call on the script, and if it has changed, it will reload the script.</td></tr>
+</table>
+
+<p>
+    Examples:
+</p>
+
+<pre class="prettyprint lang-config">
+# Tell httpd to check if the script has updated upon access
+LuaCodeCache stat
+
+# Tell httpd to cache scripts forever
+LuaCodeCache always
+
+# OR, tell httpd to never cache scripts:
+LuaCodeCache never
+</pre>
+
+<p>
+    If you are only using mod_lua for web apps, the <kbd>stat</kbd> setting is preferred, as httpd will run a stat on the file nonetheless, and mod_lua
+    uses this stat information, speeding up performance a bit.
+</p>
+
+<p>
+    <a href="/gs/apps" class="btn btn-large btn-primary">Next: Getting started with web apps</a> &nbsp;
+</p>

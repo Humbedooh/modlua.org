@@ -1,0 +1,59 @@
+What's new in mod_lua
+<h2>What's new in mod_lua</h2>
+
+<p>
+    Here's a list of new features added to trunk and the estimated release version they will be available in.
+    If you're a fan of mod_lua, you should try the trunk version, or grab the newest release version.
+</p>
+
+
+<ul>
+    <li>
+        <strong>Coming in 2.4.10:</strong>
+        <ul>
+            <li>More verbose error logging</li>
+        </ul>
+        <br/><br/>
+    </li>
+
+    <li>
+        <strong>New in 2.4.9:</strong>
+        <ul>
+            <li>The <a href="/api/database">database API</a> now supports returning rows with column names as keys</li>
+            <li><a href="/api/builtin#parsebody">r:parsebody</a> now fully supports uploading binary data</li>
+            <li><a href="/recipes/cookies">Cookies</a>: Fixes a bug where setting multiple cookies are not allowed, also adds support for path values.</li>
+            <li><a href="/recipes/cookies">Cookies</a>: Reworked setcookie entirely, so it now accepts an advanced table of data instead.</li>
+            <li>Using LuaMapHandler alongside FallbackResource will no longer invalidate the map handler when dealing with non-existent file paths</li>
+        </ul>
+        <br/><br/>
+    </li>
+    <li>
+        <strong>New in 2.4.7:</strong>
+        <ul>
+            <li><a href="/api/websocket">WebSocket support</a>: Communicate with browsers in full duplex mode, very fun stuff!</li>
+            <li><a href="/recipes/cookies">Cookie read/write support</a>: Read and write cookies in a secure and orderly manner.</li>
+            <li><a href="/hooks/logging">Logging hooks</a>: Create your own log files, change data before it gets logged, or skip the logging for specific requests.</li>
+        </ul>
+        <br/><br/>
+    </li>
+    <li>
+        <strong>New in 2.4.6:</strong>
+        <ul>
+            <li><a href="/api/form">Multipart form data support</a>: Upload files via mod_lua and more.</li>
+            <li><a href="/filters/intro">Input and Output Filters</a>: Filter data going into and out of httpd.</li>
+            <li><a href="/api/builtin#flush">Output flushing</a>: Flush data from the output buffer for a real-time display (streaming) of data.</li>
+            <li><a href="/api/builtin#sendfile">Sendfile support</a>: Send entire files using Sendfile, speeding up requests.</li>
+            <li><a href="/gs/tweaking">Server VM scope</a>: A pool of VMs that can be acquired and released, for a good compromise between effiency and RAM usage</li>
+            <li><a href="/gs/tweaking">Code caching options</a>: Set your scripts to be cached...or not</li>
+            <li><a href="/hooks/maphandler">LuaMapHandler</a>: Map URIs to scripts and specific functions within</li>
+        </ul>
+        <br/><br/>
+    </li>
+    <li>
+        <strong>New in 2.4.4:</strong>
+        <ul>
+            <li><a href="/api/database">Native database support</a>: Use MySQL, PostgreSQL and more within mod_lua!</li>
+        </ul>
+        <br/><br/>
+    </li
+</ul>

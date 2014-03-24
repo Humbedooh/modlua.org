@@ -1,0 +1,68 @@
+Output filters
+<h2 id='116089'> Output filters with mod_lua:</h2>
+The following applies an output filter to all requests to a <code>.html</code> file:
+
+<pre class='highlight prettyprint lang-config'>
+# You could omit some_filter_function and it will default to looking for a function called 'handle':
+LuaOutputFilter myOutputFilter /path/to/filter.lua some_filter_function
+&lt;FilesMatch "\.html$"&gt;
+  SetOutputFilter myOutputFilter
+&lt;/FilesMatch&gt;
+</pre>
+
+<h3 id='36578'> An example output filter: upper-casing everything</h3>
+<br/>
+Add the following to httpd.conf:
+<pre class='highlight prettyprint lang-config'>
+LuaOutputFilter UppercaseFilter /path/to/uppercase.lua uppercase
+&lt;FilesMatch "\.html$"&gt;
+  SetOutputFilter UpperCaseFilter
+&lt;/FilesMatch&gt;
+</pre>
+<br/>
+<h4 id='98668'> uppercase.lua:</h4>
+<pre class='highlight prettyprint lang-lua'>
+function uppercase(r)
+  coroutine.yield("Hi! I just turned everything into upper-case:\n") -- prepend some text
+  while bucket ~= nil do
+    coroutine.yield(bucket:upper())
+  end
+end
+</pre>
+<br/>
+<h3 id='74428'> Deflating output from httpd:</h3>
+This example shows how you can use the Lua zlib module to create a working <code>mod_deflate</code> in Lua. This has the advantages of being fully scriptable, enabling you to add deflation for specific files or requests with more precision than <code>mod_deflate</code> offers. To enable this filter, you would add the following to your httpd.conf (in the appropriate context):
+<br/>
+<pre class='highlight prettyprint lang-config'>
+# Register the filter with mod_lua:
+LuaOutputFilter deflateFilter /path/to/deflate.lua deflate
+
+# Tell httpd to apply the deflate filter on all content:
+SetOutputFilter deflateFilter
+</pre>
+<br/>
+<h4 id='109622'> deflate.lua:</h4>
+<pre class='highlight prettyprint lang-lua'>
+local zlib = require "zlib" -- see https://github.com/LuaDist/lzlib
+<br/>
+local prepare_chunk = function(data)
+    _G.zbuffer = _G.zbuffer .. string.format("%X\r\n", data:len()) .. data .. "\r\n"
+end
+<br/>
+function output_filter(r)
+    r.headers_out['Content-Encoding'] = "deflate"
+    r.headers_out['Transfer-Encoding'] = "chunked"
+    coroutine.yield()
+    local stream = zlib.deflate(prepare_chunk)
+    _G.zbuffer = ""
+    while bucket do
+        stream:write(bucket)
+        stream:flush()
+        coroutine.yield(_G.zbuffer)
+        _G.zbuffer = ""
+    end
+    stream:close()
+    coroutine.yield("0\r\n\r\n")
+end
+</pre>
+<p>For more information about using filters in mod_lua, go check out the <a href='http://httpd.apache.org/docs/trunk/mod/mod_lua.html#modifying_buckets'>mod_lua documentation on filters</a></p>

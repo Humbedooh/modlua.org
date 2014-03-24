@@ -1,0 +1,85 @@
+Rewriting URLs
+<h2>Rewriting URLs with mod_lua</h2>
+
+<p>
+    Rewriting URLs with mod_lua is very easy, and affords you much more logic and processing than, for instance, mod_rewrite ever will.
+    With mod_lua, you can query databases or external pages, use <a href="http://httpd.apache.org/docs/2.4/expr.html">expr</a> evaluations,
+    rewrite the document root and much more. Let's look at some examples:
+</p>
+
+<h3>A simple rewriting function</h3>
+
+<p>This example simply does some business logic and rewrites a URI:</p>
+
+<p><em>httpd.conf:</em></p>
+<pre class="prettyprint lang-config">
+LuaHookTranslateName /path/to/rewriter.lua rewrite_uri
+</pre>
+
+<p>
+    <em>script.lua:</em>
+</p>
+
+<pre class="prettyprint lang-lua">
+function rewrite_uri(r)
+    -- Internally rewrite / to /index.html much like the DirectoryIndex directive works
+    if r.uri == "/" then
+        r.uri = "/index.html"
+        return apache2.OK
+    end
+    
+    -- Rewrite images from .jpg to .png
+    if r.uri:match("%.jpg$") then
+        r.uri = r.uri:gsub("%.jpg$", ".png")
+        return apache2.OK
+    end
+    
+    -- Last, but not least, rewrite everything else to /foo if we feel like it
+    if math.random(1,2) == 1 then
+        r.uri = "/foo"
+    end
+    return apache2.OK
+end
+</pre>
+
+<h3>A simple mass virtual hosting script</h3>
+
+<p>
+    This example uses <a href="/api/builtin#set_document_root">r:set_document_root</a> for changing the document root
+    depending on the host name used in the request, much like mod_vhost_alias's
+    <a href="http://httpd.apache.org/docs/2.4/mod/mod_vhost_alias.html#virtualdocumentroot">VirtualDocumentRoot</a> directive.
+    The advantage here is that we can do more complex and transparent evaluation of the request before setting the
+    correct document root:
+</p>
+
+<p>
+    <em>httpd.conf:</em>
+</p>
+<pre class="prettyprint lang-config">
+&lt;VirtualHost *:80&gt;
+    ServerName foo.com
+    # Grab ALL host names sent to this server in this VirtualHost block:
+    ServerAlias *
+    # Pass on the request to mod_lua to set the doc root:
+    LuaHookTranslateName /etc/lua/docroot.lua set_docroot
+&lt;/VirtualHost&gt;
+</pre>
+
+<p>
+    <em>docroot.lua:</em>
+</p>
+
+<pre class="prettyprint lang-lua">
+function set_docroot(r)
+    -- Figure out if this is a subdomain request or not    
+    local subdomain, domain = r.hostname:match("([^.]+%.([^.]+%.[^.]+)$")
+    -- Set default doc root to /var/www/domain.tld
+    docroot = "/var/www/" .. r.hostname
+    -- if there's a sub domain, then set doc root to /var/www/domain.tld/subdomain
+    if subdomain then
+        docroot = ("/var/www/%s/%s"):format(domain, subdomain)
+    end
+    r:set_document_root(docroot)
+    return apache2.OK
+end
+</pre>

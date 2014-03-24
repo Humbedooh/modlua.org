@@ -1,0 +1,2751 @@
+Built-in functions
+ <h2 id="functions">Built-in functions:</h2>
+
+<ul class="nav nav-list">
+<li class="nav-header">Filesystem functions</li>
+<li>
+<span><a href="#get_dir_entries">get_dir_entries</a>
+        (
+        <span style="color: #368;">filePath</span>
+        ): 
+            Returns a table with all the files in a given directory
+        </span>
+</li>
+<li>
+<span><a href="#mkdir">mkdir</a>
+        (
+        <span style="color: #368;">filepath</span>,&nbsp;<span style="color: #368;">[mode]</span>
+        ): 
+            Creates a directory and sets mode to optional mode parameter.
+        </span>
+</li>
+<li>
+<span><a href="#mkrdir">mkrdir</a>
+        (
+        <span style="color: #368;">filepath</span>,&nbsp;<span style="color: #368;">[mode]</span>
+        ): 
+            Creates a directory recursively and sets mode to optional mode parameter.
+        </span>
+</li>
+<li>
+<span><a href="#rmdir">rmdir</a>
+        (
+        <span style="color: #368;">filepath</span>
+        ): 
+            Removes a directory from the file system.
+        </span>
+</li>
+<li>
+<span><a href="#stat">stat</a>
+        (
+        <span style="color: #368;">filename</span>,
+        <span style="color: #368;">[whatToGet]</span>
+        ): 
+            Runs stat() on a file, and returns a table with file information.
+        </span>
+</li>
+<li>
+<span><a href="#touch">touch</a>
+        (
+        <span style="color: #368;">filename</span>,&nbsp;<span style="color: #368;">[mtime]</span>
+        ): 
+            Touches a file, creating it if it doesn't exist. if mtime is specified, the modified time value of the file will be set to this.
+        </span>
+</li>
+<li class="nav-header">Encoding/decoding functions</li>
+<li>
+<span><a href="#base64_decode">base64_decode</a>
+        (
+        <span style="color: #368;">encodedData</span>
+        ): 
+            Decodes Base 64 encoded data.
+        </span>
+</li>
+<li>
+<span><a href="#base64_encode">base64_encode</a>
+        (
+        <span style="color: #368;">contents</span>
+        ): 
+            Encodes a string using Base 64 encoding.
+        </span>
+</li>
+<li>
+<span><a href="#date_parse_rfc">date_parse_rfc</a>
+        (
+        <span style="color: #368;">dateTime</span>
+        ): 
+            Parses a date/time string and returns seconds since epoch.
+        </span>
+</li>
+<li>
+<span><a href="#escape">escape</a>
+        (
+        <span style="color: #368;">URL</span>
+        ): 
+            URL-escapes a string.
+        </span>
+</li>
+<li>
+<span><a href="#escape_logitem">escape_logitem</a>
+        (
+        <span style="color: #368;">data</span>
+        ): 
+            Escapes a string, so that it is safe for use in httpd log files.
+        </span>
+</li>
+<li>
+<span><a href="#htpassword">htpassword</a>
+        (
+        <span style="color: #368;">password</span>,&nbsp;<span style="color: #368;">algorithm</span>,&nbsp;<span style="color: #368;">[cost]</span>
+        ): 
+            Creates a password hash from a string
+        </span>
+</li>
+<li>
+<span><a href="#md5">md5</a>
+        (
+        <span style="color: #368;">data</span>
+        ): 
+            Generates an MD5 digest sum from a string of data. This function is binary safe.
+        </span>
+</li>
+<li>
+<span><a href="#sha1">sha1</a>
+        (
+        <span style="color: #368;">data</span>
+        ): 
+            Generates a SHA1 digest sum from a string of data. This function is binary safe.
+        </span>
+</li>
+<li>
+<span><a href="#unescape">unescape</a>
+        (
+        <span style="color: #368;">URL</span>
+        ): 
+            Unescapes a string or a URL
+        </span>
+</li>
+<li class="nav-header">System functions</li>
+<li>
+<span><a href="#clock">clock</a>
+        (
+        
+        ): 
+            Returns the current time as seconds since the UNIX epoc with microsecond precision.
+        </span>
+</li>
+<li>
+<span><a href="#usleep">usleep</a>
+        (
+        <span style="color: #368;">mseconds</span>
+        ): 
+            Puts the program to sleep for a specific number of microseconds.
+        </span>
+</li>
+<li class="nav-header">Expression parsing</li>
+<li>
+<span><a href="#expr">expr</a>
+        (
+        <span style="color: #368;">eval</span>
+        ): 
+            Evaluates an expr string.
+        </span>
+</li>
+<li>
+<span><a href="#regex">regex</a>
+        (
+        <span style="color: #368;">string</span>,&nbsp;<span style="color: #368;">pattern</span>,&nbsp;<span style="color: #368;">[flags]</span>
+        ): 
+            Runs a regular expression match on a string, returning captures if matched
+        </span>
+</li>
+<li>
+<span><a href="#strcmp_match">strcmp_match</a>
+        (
+        <span style="color: #368;">string</span>,&nbsp;<span style="color: #368;">pattern</span>
+        ): 
+            Checks if 'string' matches 'pattern' using strcmp_match (globs), for instance, whether 'www.example.com' matches '*.example.com'
+        </span>
+</li>
+<li class="nav-header">Request parsing functions</li>
+<li>
+<span><a href="#parseargs">parseargs</a>
+        (
+        
+        ): 
+            Parses the GET data from a request and returns it as two tables (one for standard key/value pairs, one for multi-values).
+        </span>
+</li>
+<li>
+<span><a href="#parsebody">parsebody</a>
+        (
+        <span style="color: #368;">[sizeLimit]</span>
+        ): 
+            Parses POST data from the client and returns keys/values.
+        </span>
+</li>
+<li>
+<span><a href="#requestbody">requestbody</a>
+        (
+        <span style="color: #368;">[filename]</span>
+        ): 
+            Reads and returns the request body of a request. If filename is specified, it instead saves the contents to that file.
+        </span>
+</li>
+<li class="nav-header">Request response functions</li>
+<li>
+<span><a href="#flush">flush</a>
+        (
+        
+        ): 
+            flushes the output buffer.
+        </span>
+</li>
+<li>
+<span><a href="#getcookie">getcookie</a>
+        (
+        <span style="color: #368;">key</span>
+        ): 
+            Fetches a HTTP Cookie. Returns nothing if the cookie was not found.
+        </span>
+</li>
+<li>
+<span><a href="#puts">puts</a>
+        (
+        <span style="color: #368;">data</span>
+        ): 
+            Sends one or more variables to the response body.
+        </span>
+</li>
+<li>
+<span><a href="#send_interim_response">send_interim_response</a>
+        (
+        <span style="color: #368;">clear</span>
+        ): 
+            Sends an interim (1xx) response to the client.
+        </span>
+</li>
+<li>
+<span><a href="#sendfile">sendfile</a>
+        (
+        <span style="color: #368;">filepath</span>
+        ): 
+            Sends an entire file to the client, using sendfile if supported by the current platform.
+        </span>
+</li>
+<li>
+<span><a href="#set_keepalive">set_keepalive</a>
+        (
+        
+        ): 
+            Sets the keepalive status for a request.
+        </span>
+</li>
+<li>
+<span><a href="#setcookie">setcookie</a>
+        (
+        <span style="color: #368;">options</span>
+        ): 
+            Sets a HTTP cookie.
+        </span>
+</li>
+<li>
+<span><a href="#write">write</a>
+        (
+        <span style="color: #368;">data</span>
+        ): 
+            Writes a single string to the response body.
+        </span>
+</li>
+<li class="nav-header">Request manipulation</li>
+<li>
+<span><a href="#add_input_filter">add_input_filter</a>
+        (
+        <span style="color: #368;">filterName</span>
+        ): 
+            Adds a filter to the input stream.
+        </span>
+</li>
+<li>
+<span><a href="#addoutputfilter">addoutputfilter</a>
+        (
+        <span style="color: #368;">filterName</span>
+        ): 
+            Adds a filter to the output stream
+        </span>
+</li>
+<li>
+<span><a href="#custom_response">custom_response</a>
+        (
+        <span style="color: #368;">statusCode</span>,&nbsp;<span style="color: #368;">statusPage</span>
+        ): 
+            Sets the output of a specific status code to a page or a string.
+        </span>
+</li>
+<li>
+<span><a href="#set_document_root">set_document_root</a>
+        (
+        <span style="color: #368;">filepath</span>
+        ): 
+            Sets the document root for the current request.
+        </span>
+</li>
+<li class="nav-header">Debugging functions</li>
+<li>
+<span><a href="#exists_config_define">exists_config_define</a>
+        (
+        <span style="color: #368;">definition</span>
+        ): 
+            Checks whether a configuration definition exists or not.
+        </span>
+</li>
+<li>
+<span><a href="#loaded_modules">loaded_modules</a>
+        (
+        
+        ): 
+            Returns a list of modules loaded by httpd.
+        </span>
+</li>
+<li>
+<span><a href="#module_info">module_info</a>
+        (
+        <span style="color: #368;">moduleName</span>
+        ): 
+            Queries the server for information about a module
+        </span>
+</li>
+<li>
+<span><a href="#mpm_query">mpm_query</a>
+        (
+        <span style="color: #368;">question</span>
+        ): 
+            Queries the server for MPM information using ap_mpm_query
+        </span>
+</li>
+<li>
+<span><a href="#scoreboard_process">scoreboard_process</a>
+        (
+        <span style="color: #368;">PN</span>
+        ): 
+            Queries the server for information about the process at position PN
+        </span>
+</li>
+<li>
+<span><a href="#scoreboard_worker">scoreboard_worker</a>
+        (
+        <span style="color: #368;">PN</span>,&nbsp;<span style="color: #368;">TN</span>
+        ): 
+            Queries for information about the worker thread, TN, in process PN
+        </span>
+</li>
+<li>
+<span><a href="#server_info">server_info</a>
+        (
+        
+        ): 
+            Returns a table containing server information, such as the name of the httpd executable file, mpm used etc.
+        </span>
+</li>
+<li>
+<span><a href="#state_query">state_query</a>
+        (
+        <span style="color: #368;">queryCode</span>
+        ): 
+            Queries the server for state information
+        </span>
+</li>
+<li class="nav-header">Database functions</li>
+<li>
+<span><a href="#dbacquire">dbacquire</a>
+        (
+        <span style="color: #368;">driver</span>,&nbsp;<span style="color: #368;">[connectionString]</span>
+        ): 
+            Acquires a connection to a database and returns a database class. See Database API for details.
+        </span>
+</li>
+<li>
+<span><a href="#ivm_get">ivm_get</a>
+        (
+        <span style="color: #368;">key</span>
+        ): 
+            Fetches a global VM-independent variable set by ivm_set.
+        </span>
+</li>
+<li>
+<span><a href="#ivm_set">ivm_set</a>
+        (
+        <span style="color: #368;">key</span>,&nbsp;<span style="color: #368;">value</span>
+        ): 
+            Set an Inter-VM variable to hold a specific value.
+        </span>
+</li>
+<li class="nav-header">Logging functions</li>
+<li>
+<span><a href="#alert">alert</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs an alert message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#crit">crit</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a critical message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#debug">debug</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#emerg">emerg</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a emergency message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#emerg">emerg</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a emergency message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#err">err</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a error message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#info">info</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs an informational message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#notice">notice</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a notice in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace1">trace1</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace1 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace2">trace2</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace2 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace3">trace3</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace3 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace4">trace4</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace4 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace5">trace5</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace5 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace6">trace6</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace6 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace7">trace7</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace7 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#trace8">trace8</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a trace8 debug message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li>
+<span><a href="#warn">warn</a>
+        (
+        <span style="color: #368;">logmessage</span>
+        ): 
+            Logs a warning message in the error log if LogLevel allows it.
+        </span>
+</li>
+<li class="nav-header">WebSocket functions</li>
+<li>
+<span><a href="#wsclose">wsclose</a>
+        (
+        
+        ): 
+            Closes a WebSocket connection and unregisters the request with httpd.
+        </span>
+</li>
+<li>
+<span><a href="#wsping">wsping</a>
+        (
+        
+        ): 
+            Pings a client.
+        </span>
+</li>
+<li>
+<span><a href="#wsread">wsread</a>
+        (
+        
+        ): 
+            Reads a frame from a WebSocket client
+        </span>
+</li>
+<li>
+<span><a href="#wsupgrade">wsupgrade</a>
+        (
+        
+        ): 
+            Attempts to upgrade a HTTP connection to a WebSocket connection.
+        </span>
+</li>
+<li>
+<span><a href="#wswrite">wswrite</a>
+        (
+        <span style="color: #368;">line</span>
+        ): 
+            Sends a WebSocket frame to a client.
+        </span>
+</li>
+</ul>
+
+
+
+
+<!--- Reference below --->
+
+
+
+
+<h2 id="Filesystem_functions" name="Filesystem_functions">Filesystem functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="get_dir_entries" name="get_dir_entries">
+<span>get_dir_entries</span>(
+    string<span style="color:#DD9">&nbsp;filePath</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Returns a table with all the files in a given directory
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filePath</div>
+<div style="float: left;">The directory to get the contents of</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            A table with all the filenames contained with in the given directory.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+function handle(r)
+  local dir = r.context_document_root
+  for _, f in pairs(r:get_direntries(dir)) do
+    local info = r:stat(dir .. "/" .. f)
+    if info then
+      local mtime = os.date(fmt, info.mtime / 1000000)
+      local ftype = (info.filetype == 2) and "[dir] " or "[file]"
+      r:puts( ("s s %10i s\n"):format(ftype, mtime, info.size, f) )
+    end
+  end
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="mkdir" name="mkdir">
+<span>mkdir</span>(
+    string<span style="color:#DD9">&nbsp;filepath</span>, &nbsp;integer<span style="color:#DD9">&nbsp;[mode]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Creates a directory and sets mode to optional mode parameter.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filepath</div>
+<div style="float: left;">The directory to create</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[mode]</div>
+<div style="float: left;">Optional file mode for the new directory</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the directory was created, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local path = "/var/www/foo"
+if r:mkdir(path) then
+    r:puts("Successfully created /var/www/foo!")
+else
+    r:puts("Could not create directory - perhaps it already exists?")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="mkrdir" name="mkrdir">
+<span>mkrdir</span>(
+    string<span style="color:#DD9">&nbsp;filepath</span>, &nbsp;integer<span style="color:#DD9">&nbsp;[mode]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Creates a directory recursively and sets mode to optional mode parameter.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filepath</div>
+<div style="float: left;">The directory to create</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[mode]</div>
+<div style="float: left;">Optional file mode for the new directory</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the directory was created, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local path = "/var/www/foo/baz"
+if r:mkrdir(path) then
+    r:puts("Successfully created /var/www/foo!")
+else
+    r:puts("Could not create directory - perhaps it already exists?")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="rmdir" name="rmdir">
+<span>rmdir</span>(
+    string<span style="color:#DD9">&nbsp;filepath</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Removes a directory from the file system.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filepath</div>
+<div style="float: left;">The directory to remove</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the operation succeeded, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local badDir = "/var/www/foo"
+if r:rmdir(badDir) then
+    r:puts("Removed the directory!")
+else
+    r:puts("Could not remove the directory - it either doesn't exist or we don't have permission to do so")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="stat" name="stat">
+<span>stat</span>(
+    string<span style="color:#DD9">&nbsp;filename</span>,
+    number<span style="color:#DD9">&nbsp;whatToGet</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Runs stat() on a file, and returns a table with file information.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filename</div>
+<div style="float: left;">The file to stat</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[whatToGet]</div>
+<div style="float: left;">Flags to pass to stat (optional). This needs to be 7582064 (0x0073b170) in order to fetch <b>all</b> values from the file.</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            A table containing information such as when the file was created, last modified, its size, mode etc.
+            The keys in the table returned are: <code>mtime</code>, <code>atime</code>, <code>ctime</code>,
+            <code>size</code>, <code>filetype</code>, <code>protection</code>
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local info = r:stat("/var/www/foo.txt")
+if info then
+    r:puts("This file exists and was last modified at: " .. info.mtime)
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="touch" name="touch">
+<span>touch</span>(
+    string<span style="color:#DD9">&nbsp;filename</span>, &nbsp;number<span style="color:#DD9">&nbsp;[mtime]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Touches a file, creating it if it doesn't exist. if mtime is specified, the modified time value of the file will be set to this.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filename</div>
+<div style="float: left;">The file to touch</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[mtime]</div>
+<div style="float: left;">Optional mtime msec value to set</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the operation succeeded, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:touch("/foo/bar.txt") -- Touch /foo/bar.txt, either creating it or modifying the mtime value.
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Encoding/decoding_functions" name="Encoding/decoding_functions">Encoding/decoding functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="base64_decode" name="base64_decode">
+<span>base64_decode</span>(
+    string<span style="color:#DD9">&nbsp;encodedData</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Decodes Base 64 encoded data.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">encodedData</div>
+<div style="float: left;">The encoded data to decode</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The Base 64 decoded data
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local decoded = r:base64_decode("VGhpcyBpcyBhIHRlc3Q=") -- returns 'This is a test'
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="base64_encode" name="base64_encode">
+<span>base64_encode</span>(
+    string<span style="color:#DD9">&nbsp;contents</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Encodes a string using Base 64 encoding.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">contents</div>
+<div style="float: left;">The string to encode</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The Base 64 encoded string.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local encoded = r:base64_encode("This is a test") -- returns VGhpcyBpcyBhIHRlc3Q=
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="date_parse_rfc" name="date_parse_rfc">
+<span>date_parse_rfc</span>(
+    string<span style="color:#DD9">&nbsp;dateTime</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Parses a date/time string and returns seconds since epoch.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">dateTime</div>
+<div style="float: left;">The date string to parse</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The parsed time since the UNIX epoch in seconds.
+        </div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="escape" name="escape">
+<span>escape</span>(
+    string<span style="color:#DD9">&nbsp;URL</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            URL-escapes a string.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">URL</div>
+<div style="float: left;">The string or URL to escape</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The URL-escaped version of the string.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local url = "http://foo.bar/1 2 3 &amp; 4 + 5"
+local escaped = r:escape(url) -- returns 'http%3a%2f%2ffoo.bar%2f1+2+3+%26+4+%2b+5'
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="escape_logitem" name="escape_logitem">
+<span>escape_logitem</span>(
+    string<span style="color:#DD9">&nbsp;data</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Escapes a string, so that it is safe for use in httpd log files.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">data</div>
+<div style="float: left;">The string/data to escape</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The escaped string
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local str = r:escape_logitem([[This is a "test" &amp; stuff.]]) -- escape the string
+r:debug(str) -- log the string
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="htpassword" name="htpassword">
+<span>htpassword</span>(
+    string<span style="color:#DD9">&nbsp;password</span>, &nbsp;number<span style="color:#DD9">&nbsp;algorithm</span>, &nbsp;number<span style="color:#DD9">&nbsp;[cost]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Creates a password hash from a string
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">password</div>
+<div style="float: left;">The password to convert to htpasswd format</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">algorithm</div>
+<div style="float: left;">The hashing algorithm to use (0 = APMD5 (default), 1 = SHA, 2 = BCRYPT, 3 = CRYPT)</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[cost]</div>
+<div style="float: left;">The cost of the hashing - only valid with BCRYPT algorithm (default = 5)</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            return
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local htpwd = r:htpassword("Foo bar", 2, 100) -- Create a BCRYPT hash with a lot of cycles.
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="md5" name="md5">
+<span>md5</span>(
+    string<span style="color:#DD9">&nbsp;data</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Generates an MD5 digest sum from a string of data. This function is binary safe.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">data</div>
+<div style="float: left;">The data to generate the digest sum from</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The MD5 digest sum of the data
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local hash = r:md5("This is a test") -- returns ce114e4501d2f4e2dcea3e17b546f339
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="sha1" name="sha1">
+<span>sha1</span>(
+    string<span style="color:#DD9">&nbsp;data</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Generates a SHA1 digest sum from a string of data. This function is binary safe.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">data</div>
+<div style="float: left;">The data to generate the digest sum from</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The SHA1 digest sum of the data
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local hash = r:sha1("This is a test") -- returns a54d88e06612d820bc3be72877c74f257b561b19
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="unescape" name="unescape">
+<span>unescape</span>(
+    string<span style="color:#DD9">&nbsp;URL</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Unescapes a string or a URL
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">URL</div>
+<div style="float: left;">The string or URL to unescape</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The unescaped version of the string.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local url = "http%3a%2f%2ffoo.bar%2f1+2+3+%26+4+%2b+5"
+local unescaped = r:unescape(url) -- returns 'http://foo.bar/1 2 3 &amp; 4 + 5'
+        </pre>
+</div>
+</div>
+
+
+<h2 id="System_functions" name="System_functions">System functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="clock" name="clock">
+<span>clock</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Returns the current time as seconds since the UNIX epoc with microsecond precision.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The current time with microsecond precision.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local now = r:clock() -- for example; 123456789.987143
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="usleep" name="usleep">
+<span>usleep</span>(
+    number<span style="color:#DD9">&nbsp;mseconds</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Puts the program to sleep for a specific number of microseconds.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">mseconds</div>
+<div style="float: left;">The number of microseconds to sleep</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            Nothing
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+while we_have_stuff_to_send do
+    r:puts("Bla bla bla\n") -- print something to client
+    r:flush() -- flush the buffer (send to client)
+    r.usleep(500000) -- fake processing time for 0.5 sec. and repeat
+end
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Expression_parsing" name="Expression_parsing">Expression parsing:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="expr" name="expr">
+<span>expr</span>(
+    string<span style="color:#DD9">&nbsp;eval</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Evaluates an expr string.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">eval</div>
+<div style="float: left;">The string to evaluate</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the string evaluates to true, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r:expr("%{HTTP_HOST} =~ /^www/") then
+    r:puts("This host name starts with www")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="regex" name="regex">
+<span>regex</span>(
+    string<span style="color:#DD9">&nbsp;string</span>, &nbsp;string<span style="color:#DD9">&nbsp;pattern</span>, &nbsp;number<span style="color:#DD9">&nbsp;[flags]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Runs a regular expression match on a string, returning captures if matched
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">string</div>
+<div style="float: left;">The string to evaluate</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">pattern</div>
+<div style="float: left;">The pattern to search for</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[flags]</div>
+<div style="float: left;">Regex flags - can be a bitwise combination of: 0x01 (Ignore case), 0x02 (Multiline search)</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            If the pattern matches, a table containing the matches ($0 through $25) will be returned, otherwise returns nil.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local matches = r:regex("foo bar baz", [[foo (\w+) (\S*)]])
+if matches then
+    r:puts("The regex matched, and the last word captured ($2) was: " .. matches[2])
+end
+
+-- Example ignoring case sensitivity:
+local matches = r:regex("FOO bar BAz", [[(foo) bar]], 1)
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="strcmp_match" name="strcmp_match">
+<span>strcmp_match</span>(
+    string<span style="color:#DD9">&nbsp;string</span>, &nbsp;string<span style="color:#DD9">&nbsp;pattern</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Checks if 'string' matches 'pattern' using strcmp_match (globs), for instance, whether 'www.example.com' matches '*.example.com'
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">string</div>
+<div style="float: left;">The string to match against</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">pattern</div>
+<div style="float: left;">The pattern to look for</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if they match, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local match = r.strcmp_match("foobar.com", "foo*.com")
+if match then 
+    r:puts("foobar.com matches foo*.com")
+end
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Request_parsing_functions" name="Request_parsing_functions">Request parsing functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="parseargs" name="parseargs">
+<span>parseargs</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Parses the GET data from a request and returns it as two tables (one for standard key/value pairs, one for multi-values).
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            two tables; one standard key/value table for regular GET data, and one for multi-value data (fx. foo=1&amp;foo=2&amp;foo=3)
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local GET, GETMULTI = r:parseargs()
+r:puts("Your name is: " .. GET['name'] or "Unknown")
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="parsebody" name="parsebody">
+<span>parsebody</span>(
+    number<span style="color:#DD9">&nbsp;[sizeLimit]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Parses POST data from the client and returns keys/values.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[sizeLimit]</div>
+<div style="float: left;">The maximum amount of bytes to parse. If the request body is larger than this, it will be ignored</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            Two tables, just like parseargs; One for common key/value pairs, and one for multi-value pairs.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local POST, POSTMULTI = r:parsebody(1024*1024)
+r:puts("Your name is: " .. POST['name'] or "Unknown")
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="requestbody" name="requestbody">
+<span>requestbody</span>(
+    string<span style="color:#DD9">&nbsp;[filename]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Reads and returns the request body of a request. If filename is specified, it instead saves the contents to that file.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[filename]</div>
+<div style="float: left;">Optional filename to store the contents of the request body in</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            return
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local input = r:requestbody()
+r:puts("You sent the following request body to me:\n")
+r:puts(input)
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Request_response_functions" name="Request_response_functions">Request response functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="flush" name="flush">
+<span>flush</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            flushes the output buffer.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the flush was successful, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+
+while we_have_stuff_to_send do
+    r:puts("Bla bla bla\n") -- print something to client
+    r:flush() -- flush the buffer (send to client)
+    r.usleep(500000) -- fake processing time for 0.5 sec. and repeat
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="getcookie" name="getcookie">
+<span>getcookie</span>(
+    string<span style="color:#DD9">&nbsp;key</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Fetches a HTTP Cookie. Returns nothing if the cookie was not found.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">key</div>
+<div style="float: left;">The key to look up</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The value of the HTTP cookie if present, otherwise nothing.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local cookie = r:getcookie("FooCookie")
+if cookie then
+    r:puts("You sent me a cookie: ", cookie)
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="puts" name="puts">
+<span>puts</span>(
+    string<span style="color:#DD9">&nbsp;data</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sends one or more variables to the response body.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">data</div>
+<div style="float: left;">The data to send</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:puts("hello", " world", "!")
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="send_interim_response" name="send_interim_response">
+<span>send_interim_response</span>(
+    boolean<span style="color:#DD9">&nbsp;clear</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sends an interim (1xx) response to the client.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">clear</div>
+<div style="float: left;">Whether to clear the request (send and clear whatever headers we have lined up)</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:send_interim_response(true)
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="sendfile" name="sendfile">
+<span>sendfile</span>(
+    string<span style="color:#DD9">&nbsp;filepath</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sends an entire file to the client, using sendfile if supported by the current platform.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filepath</div>
+<div style="float: left;">The filename to send using sendfile</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the operation succeeded, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if use_sendfile_thing then
+    r:sendfile("/var/www/large_file.img")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="set_keepalive" name="set_keepalive">
+<span>set_keepalive</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sets the keepalive status for a request.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if keepalive could be set, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:set_keepalive()
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="setcookie" name="setcookie">
+<span>setcookie</span>(
+    string<span style="color:#DD9">&nbsp;options</span>, &nbsp;table
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sets a HTTP cookie.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">options</div>
+<div style="float: left;">The cookie options</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:setcookie{
+  key = [key],
+  value = [value],
+  expires = [expiry],
+  secure = [boolean],
+  httponly = [boolean],
+  path = [path],
+  domain = [domain]
+} -- Sets a HTTP cookie, for instance:
+
+r:setcookie{
+  key = "cookie1",
+  value = "HDHfa9eyffh396rt",
+  expires = os.time() + 86400,
+  secure = true
+}
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="write" name="write">
+<span>write</span>(
+    string<span style="color:#DD9">&nbsp;data</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Writes a single string to the response body.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">data</div>
+<div style="float: left;">The string to be sent</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:write("Hello world!")
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Request_manipulation" name="Request_manipulation">Request manipulation:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="add_input_filter" name="add_input_filter">
+<span>add_input_filter</span>(
+    string<span style="color:#DD9">&nbsp;filterName</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Adds a filter to the input stream.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filterName</div>
+<div style="float: left;">The name of the filter to add</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="addoutputfilter" name="addoutputfilter">
+<span>addoutputfilter</span>(
+    string<span style="color:#DD9">&nbsp;filterName</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Adds a filter to the output stream
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filterName</div>
+<div style="float: left;">The name of the filter to add</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:addoutputfilter("fooFilter") -- add the fooFilter to the output stream
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="custom_response" name="custom_response">
+<span>custom_response</span>(
+    number<span style="color:#DD9">&nbsp;statusCode</span>, &nbsp;string<span style="color:#DD9">&nbsp;statusPage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sets the output of a specific status code to a page or a string.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">statusCode</div>
+<div style="float: left;">The status code to change responses for</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">statusPage</div>
+<div style="float: left;">The string or page to send to the browser</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+r:custom_response(404, "Baleted!")
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="set_document_root" name="set_document_root">
+<span>set_document_root</span>(
+    string<span style="color:#DD9">&nbsp;filepath</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sets the document root for the current request.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">filepath</div>
+<div style="float: left;">The document root to set for this request</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r.uri = "/foo" then
+    r:set_document_root("/var/www/foo/foo2")
+end
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Debugging_functions" name="Debugging_functions">Debugging functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="exists_config_define" name="exists_config_define">
+<span>exists_config_define</span>(
+    string<span style="color:#DD9">&nbsp;definition</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Checks whether a configuration definition exists or not.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">definition</div>
+<div style="float: left;">The definition to check for</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            true if the definition exists, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r.exists_config_define("FOO") then
+    r:puts("httpd was probably run with -DFOO, or it was defined in the configuration")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="loaded_modules" name="loaded_modules">
+<span>loaded_modules</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Returns a list of modules loaded by httpd.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            A simple list (array) of all the modules that are currently loaded by httpd.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+for k, module in pairs(r:loaded_modules()) do
+    r:puts("I have loaded module " .. module .. "\n")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="module_info" name="module_info">
+<span>module_info</span>(
+    string<span style="color:#DD9">&nbsp;moduleName</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Queries the server for information about a module
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">moduleName</div>
+<div style="float: left;">The name of the module to query for</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            A table with information about the module, or nil if no such module.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local mod = r.module_info("mod_lua.c")
+if mod then
+    for k, v in pairs(mod.commands) do
+       r:puts( ("%s: %s\n"):format(k,v)) -- print out all directives accepted by this module
+    end
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="mpm_query" name="mpm_query">
+<span>mpm_query</span>(
+    number<span style="color:#DD9">&nbsp;question</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Queries the server for MPM information using ap_mpm_query
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">question</div>
+<div style="float: left;">The data number to query for</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The data fetched from ap_mpm_query.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local mpm = r.mpm_query(14)
+if mpm == 1 then
+    r:puts("This server uses the Event MPM")
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="scoreboard_process" name="scoreboard_process">
+<span>scoreboard_process</span>(
+    number<span style="color:#DD9">&nbsp;PN</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Queries the server for information about the process at position PN
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">PN</div>
+<div style="float: left;">The process number to query</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            return
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local process = r:scoreboard_process(1)
+r:puts("Server 1 has PID " .. process.pid)
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="scoreboard_worker" name="scoreboard_worker">
+<span>scoreboard_worker</span>(
+    string<span style="color:#DD9">&nbsp;PN</span>, &nbsp;string<span style="color:#DD9">&nbsp;TN</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Queries for information about the worker thread, TN, in process PN
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">PN</div>
+<div style="float: left;">The process number to query</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">TN</div>
+<div style="float: left;">The thread number to query</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            return
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+local thread = r:scoreboard_worker(1, 1)
+r:puts("Server 1's thread 1 has thread ID " .. thread.tid .. " and is in " .. thread.status .. " status")
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="server_info" name="server_info">
+<span>server_info</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Returns a table containing server information, such as the name of the httpd executable file, mpm used etc.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="state_query" name="state_query">
+<span>state_query</span>(
+    string<span style="color:#DD9">&nbsp;queryCode</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Queries the server for state information
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">queryCode</div>
+<div style="float: left;">The code to query</div>
+</div>
+</div>
+</div>
+
+
+<h2 id="Database_functions" name="Database_functions">Database functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="dbacquire" name="dbacquire">
+<span>dbacquire</span>(
+    string<span style="color:#DD9">&nbsp;driver</span>, &nbsp;string<span style="color:#DD9">&nbsp;[connectionString]</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Acquires a connection to a database and returns a database class. See Database API for details.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">driver</div>
+<div style="float: left;">The database driver to use (mod_dbd, mysql, odbc etc)</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">[connectionString]</div>
+<div style="float: left;">The connection string to use</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="ivm_get" name="ivm_get">
+<span>ivm_get</span>(
+    string<span style="color:#DD9">&nbsp;key</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Fetches a global VM-independent variable set by ivm_set.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">key</div>
+<div style="float: left;">The key to look up</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The contents of the variable if it exists or nil if no such variable exists.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+function handle(r)
+    -- First VM to call this will get no value, and will have to create it
+    local foo = r:ivm_get("cached_data")
+    if not foo then
+        foo = do_some_calcs() -- fake some return value
+        r:ivm_set("cached_data", foo) -- set it globally
+    end
+    r:puts("Cached data is: ", foo)
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="ivm_set" name="ivm_set">
+<span>ivm_set</span>(
+    string<span style="color:#DD9">&nbsp;key</span>, &nbsp;string<span style="color:#DD9">&nbsp;value</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Set an Inter-VM variable to hold a specific value.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">key</div>
+<div style="float: left;">The key to use for internal lookups</div>
+</div>
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">value</div>
+<div style="float: left;">The value to set inside the key</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+-- An example getter/setter that saves a global variable outside the VM:
+function handle(r)
+    -- First VM to call this will get no value, and will have to create it
+    local foo = r:ivm_get("cached_data")
+    if not foo then
+        foo = do_some_calcs() -- fake some return value
+        r:ivm_set("cached_data", foo) -- set it globally
+    end
+    r:puts("Cached data is: ", foo)
+end
+        </pre>
+</div>
+</div>
+
+
+<h2 id="Logging_functions" name="Logging_functions">Logging functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="alert" name="alert">
+<span>alert</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs an alert message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="crit" name="crit">
+<span>crit</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a critical message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="debug" name="debug">
+<span>debug</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="emerg" name="emerg">
+<span>emerg</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a emergency message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="emerg" name="emerg">
+<span>emerg</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a emergency message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="err" name="err">
+<span>err</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a error message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="info" name="info">
+<span>info</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs an informational message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="notice" name="notice">
+<span>notice</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a notice in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace1" name="trace1">
+<span>trace1</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace1 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace2" name="trace2">
+<span>trace2</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace2 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace3" name="trace3">
+<span>trace3</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace3 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace4" name="trace4">
+<span>trace4</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace4 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace5" name="trace5">
+<span>trace5</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace5 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace6" name="trace6">
+<span>trace6</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace6 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace7" name="trace7">
+<span>trace7</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace7 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="trace8" name="trace8">
+<span>trace8</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a trace8 debug message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="warn" name="warn">
+<span>warn</span>(
+    string<span style="color:#DD9">&nbsp;logmessage</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Logs a warning message in the error log if LogLevel allows it.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">logmessage</div>
+<div style="float: left;">The message to log</div>
+</div>
+</div>
+</div>
+
+
+<h2 id="WebSocket_functions" name="WebSocket_functions">WebSocket functions:</h2>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="wsclose" name="wsclose">
+<span>wsclose</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Closes a WebSocket connection and unregisters the request with httpd.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r:wsupgrade() then
+    r:wswrite("Hello and goodbye!")
+    r:wsclose()
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="wsping" name="wsping">
+<span>wsping</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Pings a client.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            True if the client responded with PONG, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r:wsupgrade() then
+    if r:wsping() then
+        print("ping? PONG!")
+    else
+        print("You didn't pong when I pinged :("))
+    end
+    r:wsclose()
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="wsread" name="wsread">
+<span>wsread</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Reads a frame from a WebSocket client
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            The frame read as a string, or nil if no frame was sent.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r:wsupgrade() then
+    local line = r:wsread or "nothing"
+    r:wswrite("You wrote: " .. line)
+    r:wsclose()
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="wsupgrade" name="wsupgrade">
+<span>wsupgrade</span>(
+    
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Attempts to upgrade a HTTP connection to a WebSocket connection.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+            None
+        </div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Return value(s):</h4>
+<div class="arguments">
+            True if the connection was upgraded, false otherwise.
+        </div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r:wsupgrade() then
+    r:wswrite("Welcome to websockets!")
+    r:wsclose()
+else
+    r:puts("You're not requesting a WebSocket connection :("))
+end
+        </pre>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<small><a href="#functions">Back to top</a></small>
+<hr style="width: 100%;">
+<h3 id="wswrite" name="wswrite">
+<span>wswrite</span>(
+    string<span style="color:#DD9">&nbsp;line</span>
+    )
+  </h3>
+<p>
+<span style="color:#005500">
+            Sends a WebSocket frame to a client.
+        </span>
+<br>
+</p>
+<h4>Arguments:</h4>
+<div class="arguments">
+<div style="clear: both; width: 100%;">
+<div style="float: left; width: 150px; font-weight: bold;">line</div>
+<div style="float: left;">The string to send to the client</div>
+</div>
+</div>
+<div style="width: 100%; clear: both; float: left;">
+<h4>Example:</h4>
+<pre class="prettyprint lang-lua">
+if r:wsupgrade() then
+    r:wswrite("Welcome!")
+    r:wswrite("Goodbye!")
+    r:wsclose()
+end
+        </pre>
+</div>
+</div>

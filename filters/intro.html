@@ -1,0 +1,96 @@
+Introduction to filters
+<h2 id='51866'> Introduction to filters</h2>
+<p>
+With the release of httpd 2.4.6, mod_lua now offers input and output filtering, making it easy to shape the input and output of httpd to your needs.
+</p>
+<p>
+    
+A filter is essentially a function that takes a "bucket" of data, transforms it, and sends it on to either the client/server or the next filter in the filter chain. In mod_lua, these filters are implemented as coroutines with three different steps:
+</p>
+
+<ul><li> Filter initializer (preface)</li>
+<li> Content filtering loop</li>
+<li> Filter termination (postscript)</li>
+</ul>
+<p>
+The example below illustrates how a filter could be set up:
+</p>
+
+<pre class='highlight prettyprint lang-lua'>
+function filter(r)
+   -- Do we want to run this filter?
+   if not we_want_to_filter then
+      return -- skip the filter completely
+   end
+   
+   -- Initialize stuff here
+   init_stuff()
+   -- First step is done, yield the coroutine to go to step two
+   coroutine.yield()
+   
+   -- Next step, the actual filtering:
+   while bucket ~= nil do
+      local result = transform_content(bucket)
+      coroutine.yield(bucket)
+   end
+   
+   -- Final and optional step:
+   close_up_shop()
+   coroutine.yield("Killroy was here") -- Add a signature to all output
+</pre>
+<h3 id='117130'> The filter phases in detail:</h3>
+<h4 id='16664'> Initialization</h4>
+<p>
+The initialization phase is what happens before actual content is passed to the filter. This phase can be used to set up initial variables and check how the filter should act, or it can be used to set headers or internal request variables. When using the <a href='http://httpd.apache.org/docs/trunk/mod/mod_lua.html#luaoutputfilter'><code>LuaOutputFilter</code></a>, the initial phase can also be used to append data to the output:
+</p>
+<pre class='highlight prettyprint lang-lua'>
+-- An example output filter:
+function filter(r)
+    -- Init phase: set some headers and prepend content to the output:
+    r.headers_out['Content-Type'] = "application/x-foo"
+    coroutine.yield("This is a header appended to all output\n")
+    
+    ...
+end
+</pre>
+<h4 id='115212'> Content transformation</h4>
+<p>
+The actual content transformation phase is a loop that checks if there are still new pieces of data being sent to the filter. This is done by checking if the global variable <code>bucket</code> is not <code>nil</code>. The transformed data is passed back to httpd by issuing a yield (<code>coroutine.yield</code>) containing the data to substitute the original data with:
+</p>
+<pre class='highlight prettyprint lang-lua'>
+function filter(r)
+    -- init stuff...
+    coroutine.yield() -- done with init phase
+    
+    -- Here comes the transformations:
+    while bucket ~= nil do
+        local new_chunk = transform_data(bucket) -- xform the data in the bucket
+        coroutine.yield(new_chunk) -- Pass the transformed data back to httpd
+    end -- no more chunks ;(
+    ...
+end
+</pre>
+<h4 id='70647'> Finishing up</h4>
+<p>
+Finally, we're at the last phase, which is completely optional. This phase can be used to clean up, or it can be used to pass a final bit of information/data to httpd, like so:
+</p>
+<pre class='highlight prettyprint lang-lua'>
+function filter(r)
+    -- initial stuff
+    coroutine.yield()
+    
+    -- the filter
+    while bucket ~= nil do
+        coroutine.yield(transform(bucket))
+    end
+    
+    -- Finishing up, adding some data to the end of our input/output
+    finish_up()
+    coroutine.yield("This is appended to all the input or output this filter handles")
+end
+</pre>
+
+<p>
+    Continue on to the "<a href="/filters/output">Output filters</a>" or the "<a href="/filters/input">Input filters</a>" documents to
+    learn how to apply filters to httpd's output and input.
+</p>

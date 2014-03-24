@@ -1,0 +1,46 @@
+Hello world!
+<h2>Recipe: Hello world!</h2>
+<p>
+    This is a very simple web app that just prints out "Hello world!" to the browser.
+</p>
+
+<p>httpd.conf setup:</p>
+<pre class="prettyprint lang-config">
+    AddHandler lua-script .lua
+</pre>
+
+<p>
+    index.lua:
+</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    r.content_type = "text/html" -- set the output to text/html
+    r:puts("Hello world!")
+    return apache2.OK
+end
+</pre>
+
+<h3>Alternate approach: Using a Quick Handler for speedy speediness</h3>
+<p>If you are all about speed and don't care much for what httpd gets to do (especially if you don't even need anything in your access log),
+you can set this script up as a Quick Handler, and bypass everything that httpd does, for maximum speed:</p>
+
+<p>httpd.conf setup:</p>
+<pre class="prettyprint lang-config">
+    LuaQuickHandler /var/www/index.lua quick_handler
+</pre>
+
+<p>
+    index.lua:
+</p>
+
+<pre class="prettyprint lang-lua">
+function quick_handler(r)
+    if r.uri == "/" then
+        r.content_type = "text/html" -- set the output to text/html
+        r:puts("Hello world!")
+        return apache2.DONE -- we're DONE - skip logging and all the rest httpd does, for MAXIMUM SPEEEED
+    end
+    return apache2.DECLINED
+end
+</pre>

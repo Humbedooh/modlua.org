@@ -1,0 +1,68 @@
+Quick Handler hooks
+<h2>Quick Handler hooks in mod_lua</h2>
+
+<p>
+    The quick handling phase begins right after the request has been parsed, and before all the other phases.
+    The purpose of this phase is to quickly assess a request and act before we do all the translation, mapping, fixing,
+    handling, logging et cetera.
+</p>
+
+<p>
+    The use cases for this phase are plenty: We can use it to quickly deny access to a resource without having to
+    go through all the other phases, or we can use it to quickly give a reply and exit the request without having
+    to translate, map or log the request, thus speeding things up:
+</p>
+
+<pre class="prettyprint lang-config">
+LuaQuickHandler /etc/lua/scripts/quickhandler.lua quick
+</pre>
+
+<pre class="prettyprint lang-lua">
+-- quickhandler.lua:
+
+function quick(r)
+    -- If the user requests, for instance, http://mydomain.tld/, then we'll just handle it here and skip everything else
+    if r.uri == "/" then
+        r.content_type = "text/html"
+        r:puts("Hello, world!")
+        return apache2.DONE -- DONE really means "we're done, skip everything else, even logging"
+    else
+        return apache2.DECLINED -- DECLINED here means "we did't handle this, continue with the other phases"
+    end
+end
+</pre>
+
+<p>
+    Another, more useful approach is a security module that checks how frequently a client has requested a resource,
+    and if, for example, it was less than a second ago since the last request, we deny a new one for now:
+</p>
+
+<pre class="prettyprint lang-config">
+LuaQuickHandler /etc/lua/scripts/quickhandler.lua accesscheck
+</pre>
+
+<pre class="prettyprint lang-lua">
+-- quickhandler.lua:
+
+function accesscheck(r)
+    local now = r.clock() -- Get the current time with microsec precision
+    local ip = r.useragent_ip -- fetch the client's IP
+    local last = r:ivm_get("last_" .. ip) -- Get the last access time of this client from global storage
+    local okay = true
+    if last then
+        if (now - last) < 1 then
+            okay = false
+        end
+    end
+    r:ivm_set("last_" .. ip, now) -- Update the record of when the last access was
+    
+    -- Is the client allowed to acccess already, or do we deny?
+    if not okay then
+        r.content_type = "text/plain"
+        r:write("Too many requests per second, please go have a cup of coffee!")
+        return apache2.DONE -- We're done with this, ignore the other phases
+    else
+        return apache2.DECLINED -- The client is allowed to continue, we're not handling this
+    end
+end
+</pre>

@@ -1,0 +1,41 @@
+Compiling and installing
+<h2>Compiling and installing mod_lua</h2>
+
+<p><strong>Note:</strong> mod_lua requires Apache httpd 2.4.1 or later.</p>
+
+<h3>Getting mod_lua from a distribution provider</h3>
+<p>
+    If you are downloading httpd 2.4 from a distribution set such as Debian, Red Hat, Ubuntu etc,
+    please refer to their documentation on installing mod_lua. If you are building httpd yourself,
+    keep reading this document.
+</p>
+
+<h3>Compiling from scratch</h3>
+<p>
+Enabling mod_lua at compile-time can be achieved by adding <code>--enable-lua</code> to the <code>configure</code> command, for instance:
+</p>
+<pre class="prettyprint lang-sh">
+    ./configure --with-included-apr --with-mysql=/usr --enable-lua
+</pre>
+<p>
+If you prefer to manually compile, install and activate mod_lua, you can do so using
+<a href="http://httpd.apache.org/docs/2.4/programs/apxs.html">apxs</a>, by using the following command
+inside the mod_lua source folder (modules/lua):
+</p>
+<pre class="prettyprint lang-sh">
+    apxs -c -i -a -llua mod_lua.c lua_*.c
+</pre>
+<p>You may need to adjust the <code>-llua</code> argument, so it matches the name of your Lua library file.</p>
+
+<h3>Loading mod_lua into httpd</h3>
+<p>
+    To load mod_lua into httpd, add or uncomment the following line in httpd.conf:
+</p>
+<pre class="prettyprint lang-config">
+    LoadModule lua_module         modules/mod_lua.so
+</pre>
+
+<p>That's it, mod_lua is installed and loaded! Check out <a href="/gs/setup">this page</a> for pointers on how to set up mod_lua.</p>
+<p>
+    <a href="/gs/setup" class="btn btn-large btn-primary">Next: setting up mod_lua</a> &nbsp;
+</p>

@@ -1,0 +1,32 @@
+Access check
+<h2>Access checking with mod_lua</h2>
+
+<p>
+    The access checker phase is a simple phase, whose purpose is to determine whether a client has access to a resource or not.
+    This is <strong>not</strong> to be confused with the authorization/authentication phase, as this phase happens <em>before</em>
+    those phases kick in. Think of this as an early phase where you can disallow an IP access ot a resource, or specify a specific
+    time table for access. This phase is activated through the <code>LuaHookAccessChecker</code> directive, as such:
+</p>
+<pre class="prettyprint lang-config">
+    LuaHookAccessChecker /etc/lua/scripts/access.lua access_checker
+</pre>
+
+<p>We can then create a simple access checker in Lua:</p>
+
+<pre class="prettyprint lang-lua">
+function access_checker(r)
+    -- First, let's check if the IP is '127.0.0.2', and if so, deny access
+    if r.useragent_ip == '127.0.0.2' then
+        return 403 -- 403 is the 'Forbidden' status code
+    end
+    
+    -- Then, let's check the time of day and only allow people access between
+    -- 7 AM and 7 PM (7 and 19):
+    local now = os.date("*t")
+    if now.hour >= 7 and now.hour < 19 then
+        return apache2.OK
+    else
+        return 403 -- forbidden!
+    end
+end
+</pre>

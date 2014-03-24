@@ -1,0 +1,66 @@
+Recipes: Load balancing
+<h2> Creating a rudimentary load balancer with mod_lua </h2>
+Making a load balancer with <code>mod_lua</code> is quite easy.
+In this example, I have created two load balancers, one that randomly distributes the load, and one that distributes the load evenly across backends using the new <a href='/api/builtin#ivm_get'>ivm_get/ivm_set</a> features in httpd 2.4.5.
+<br/>
+<br/>
+This function hooks into the <code>translate_name</code> phase of a request, which is equivalent to what mod_proxy does with ProxyPass. In a way, the example below is equivalent of using a balancer group and the ProxyPass directive, only it gives you more power over creating just the balancing technique you want to, plus it's great fun!
+<br/>
+<br/>
+Now, onwards to the example:
+<br/>
+<br/>
+<h3 id='116089'> httpd.conf entry:</h3>
+<pre class='highlight prettyprint lang-config'>
+LuaHookTranslateName /path/to/balancer.lua proxy_handler
+</pre>
+<br/>
+<br/>
+<h3> balancer.lua (random edition):</h3>
+<pre class='highlight prettyprint lang-lua'>
+local backends = {
+  "http://backend1.foo.com/",
+  "http://backend2.foo.com/",
+  "http://backend3.foo.com/"
+}
+<br/>
+function proxy_handler(r)
+    r.handler  = "proxy-server"
+    r.proxyreq = apache2.PROXYREQ_REVERSE
+    r.filename = "proxy:" .. backends[math.random(1,#backends)] .. r.uri
+    return apache2.DECLINED -- let the proxy handler do this instead
+end
+</pre>
+<br/>
+<h3> balancer.lua (even distribution edition):</h3>
+<pre class='highlight prettyprint lang-lua'>
+local backends = {
+  "http://backend1.foo.com/",
+  "http://backend2.foo.com/",
+  "http://backend3.foo.com/"
+}
+<br/>
+function proxy_handler(r)
+    r.handler  = "proxy-server"
+    r.proxyreq = apache2.PROXYREQ_REVERSE
+    -- Get number of total backends
+    local number_of_balancers = #backends
+    
+    -- Get the previously used backend from the global server records
+    local backend_choice = r:ivm_get("mod_lua_balancer_previous") or 0
+    
+    -- Increment or set to the first balancer if we've just used the last one
+    backend_choice = backend_choice + 1
+    if backend_choice > number_of_balancers then
+        backend_choice = 1
+    end
+    
+    -- Set the used backend in the global pool
+    r:ivm_set("mod_lua_balancer_previous", backend_choice)
+    
+    -- Redirect to the balancer
+    r.filename = "proxy:" .. backends[backend_choice] .. r.uri
+    return apache2.DECLINED -- let the proxy handler do this instead
+end
+</pre>
+<br/>

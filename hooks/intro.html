@@ -1,0 +1,25 @@
+Introduction to hooks
+<h2>Introduction to hooks in mod_lua</h2>
+
+<p>
+    Hooks are one of the backbones of mod_lua and encompasses a plethora of possibilities.
+    With them, you can hook into various processing phases of httpd, and change the outcome
+    of a request, manipulate headers, proxy requests to backends, change URLs or file system
+    paths and so on.
+</p>
+
+<p>
+    The hooks available to mod_lua are:
+</p>
+
+<table class="table table-striped">
+    <tr><th>Hook name</th><th>Directive used</th><th>Description</th><th>Documentation/examples</th></tr>
+    <tr><td>Quick handler</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaQuickHandler">LuaQuickHandler</a></code></td><td>This is the first hook that will be called after a request has been mapped to a host or virtual host</td><td><a href="/hooks/quick">Here</a></td></tr>
+    <tr><td>Translate name</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookTranslateName">LuaHookTranslateName</a></code></td><td>This phase translates the requested URI into a filename on the system. Modules such as mod_alias and mod_rewrite operate in this phase.</td><td><a href="/hooks/translate_name">Here</a></td></tr>
+    <tr><td>Map to storage</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookMapToStorage">LuaHookMapToStorage</a></code></td><td>This phase maps files to their physical, cached or external/proxied storage. It can be used by proxy or caching modules</td><td><a href="/hooks/map_to_storage">Here</a></td></tr>
+    <tr><td>Check Access</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookAccessChecker">LuaHookAccessChecker</a></code></td><td>This phase checks whether a client has access to a resource. This phase is run before the user is authenticated, so beware. </td><td><a href="/hooks/access">Here</a></td></tr>
+    <tr><td>Check User ID</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookCheckUserID">LuaHookCheckUserID</a></code></td><td>This phase is used to check the negotiated user ID</td><td><a href="/hooks/userid">Here</a></td></tr>
+    <tr><td>Check Authorization</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookAuthChecker">LuaHookAuthChecker</a></code> or <code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaAuthzProvider">LuaAuthzProvider</a></code></td><td>This phase authorizes a user based on the negotiated credentials, such as user ID, client certificate etc. </td><td><a href="/hooks/auth">Here</a></td></tr>
+    <tr><td>Fixups</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookFixups">LuaHookFixups</a></code></td><td>This is the final "fix anything" phase before the content handlers are run. Any last-minute changes to the request should be made here.</td><td><a href="/hooks/fixups">Here</a></td></tr>
+    <tr><td>Logging</td><td><code><a href="http://httpd.apache.org/docs/trunk/mod/mod_lua.html#LuaHookLog">LuaHookLog</a></code></td><td>Once a request has been handled, it enters several logging phases, which logs the request in either the error or access log. Mod_lua is able to hook into the start of this and control logging output.</td><td><a href="/hooks/logging">Here</a></td></tr>
+</table>

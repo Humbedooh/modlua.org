@@ -1,0 +1,173 @@
+Working with WebSockets
+<h2>Working with WebSockets in mod_lua</h2>
+<p>
+    mod_lua supports basic WebSocket operations such as reading, writing and pinging WebSocket clients with the new 2.4.7 release.
+</p>
+<p>
+    To make a request turn into a WebSocket request, all you have to do is call <a href="/api/builtin#wsupgrade">r:wsupgrade</a>
+    and, if it succeeds, you'll be able to read and write to the client.
+</p>
+<p>Reading and writing are done through WebSocket's full duplex frames, meaning you can interact with your server in a more
+dynamic way than with plain HTTP. To send a message to your client, use <a href="/api/builtin#wswrite">r:wswrite</a>,
+and to read a message from the client, use <a href="/api/builtin#wsread">r:wsread</a>. You can also perform a ping/pong
+interaction through <a href="/api/builtin#wsping">r:wsping</a>. mod_lua supports reading masked frames, both binary and text,
+and sends back unmasked text frames for maximum browser compatibility.</p>
+
+<p>
+    Both the plain text WS protocol and the secure (WSS) protocol is supported by mod_lua.
+</p>
+
+
+<h3>An example script:</h3>
+
+<pre class="prettyprint lang-lua">
+-- First, try to upgrade the connection to WebSockets:
+if r:wsupgrade() then
+    -- Then, we'll write something to the client:
+    r:wswrite("Hello, world! Please send me someting.")
+    
+    -- Receive a line (frame) from the client:
+    local line = r:wsread() or "nothing"
+    
+    -- Echo that line back to the client
+    r:wswrite("You wrote: " .. line)
+    
+    -- Close up the connection
+    r:wswrite("Goodbye!")
+    r:wsclose()
+end
+</pre>
+
+<h3> Making a calculator with WebSockets </h3>
+
+<pre class="prettyprint lang-lua">
+function wshandle(r)
+
+    -- Is this a websocket request?
+    if r:wsupgrade() then
+
+        -- Greet the client
+        r:wswrite("Hi, this is a websocket calculator, please enter some math, or enter 'exit' to quit: \n")
+
+        -- Read a math question from client
+        local line, fin = r:wsread()
+        while line do
+
+            -- Is the client quitting?
+            if line == 'exit' then break end
+
+            -- Only allow math stuffs
+            line = line:gsub("[^%s0-9%-%%+/*^%(%)]", "")
+
+            -- Do the math
+            local okay, result = pcall(loadstring("return (" .. line .. ")"))
+
+            -- Output the result
+            if okay then
+                r:wswrite(line .. " = " .. result)
+            else
+                r:wswrite("Bad math :(")
+            end
+
+            -- Read a new math question
+            line = r:wsread()
+        end
+
+        -- Bye bye!
+        r:wswrite("Goodbye!")
+        r:wsclose()
+    	return apache2.DONE
+    end
+    return apache2.DECLINED
+end
+</pre>
+
+<h4> Try it out!! </h4>
+
+<form id="my-form">
+<b>Enter some math (or enter 'exit' to quit): </b><input type="text" name="math"/> <input type="submit" value="calc it!"/>
+</form>
+
+<script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://www.modlua.org/ws.lua";
+  var output;
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED TO " + wsUri);
+    //doSend("WebSocket rocks");
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+    //websocket.close();
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message); 
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+  function processForm(e) {
+    if (e.preventDefault) e.preventDefault();
+
+    /* do what you want with the form */
+
+    // You must return false to prevent the default form behavior
+    return false;
+}
+var form = document.getElementById('my-form');
+function processForm(e) {
+    if (e.preventDefault) e.preventDefault();
+    doSend(form.math.value);
+    return false;
+}
+
+if (form.attachEvent) {
+    form.attachEvent("submit", processForm);
+} else {
+    form.addEventListener("submit", processForm);
+}
+
+</script>
+
+
+<div id="output"></div>

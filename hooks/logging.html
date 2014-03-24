@@ -1,0 +1,28 @@
+Logging
+<h2>Hooking into the logging phase with mod_lua</h2>
+
+<p>
+    The logging phase that mod_lua has access to is quite simple. When you use the <code>LuaHookLog</code> directive,
+    you can hook into the logging phase very early and either change the parameters of the request before logging occurs,
+    or you can opt to write to your own mod_lua log file thingy and omit the record from the 'official' log files.
+</p>
+
+<p>
+    Let's look at how you would create a custom handler that checks and omits certain requests from the log files:
+</p>
+
+<pre class="prettyprint lang-config">
+#httpd.conf:
+LuaHookLog /etc/lua/scripts/logging.lua log_handler
+</pre>
+
+<pre class="prettyprint lang-lua">
+-- logging.lua:
+function log_handler(r)
+    if r.uri:match("/secret_area/") then
+        return apache2.DONE -- skip the actual logging, this is secret!
+    else
+        return apache2.DECLINED -- pass the buck to the other logging handlers
+    end
+end
+</pre>

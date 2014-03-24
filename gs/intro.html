@@ -1,0 +1,56 @@
+Introduction to mod_lua
+<h2>Introduction to mod_lua</h2>
+
+<h3>What is mod_lua?</h3>
+<p>
+    mod_lua allows the Apache HTTP Server to be extended with scripts written in the <a href="http://www.lua.org">Lua</a> programming language.
+    The extension points include <a href="/hooks/intro">request phase hooks</a>, <a href="/filters/intro">filtering mechanisms</a> as well as
+    the ability to develop web applications using Lua. It has native support for <a href="/api/database">databases</a> as well as a lot of
+    <a href="/api/builtin">built-in functions</a> to ease working with requests.
+</p>
+
+<h3>How it works</h3>
+<p>
+    Stuff to be written here...
+</p>
+
+<h3>The standard interaction with Lua</h3>
+<p>
+    mod_lua's interaction with Lua scripts is function-oriented, meaning mod_lua will first load the script, execute
+    the flow of the script and then call a specific function (the default name of this is <kbd>handle</kbd>) to handle
+    the request. Most mod_lua directives have the option to specify the name of the function to call, so that you can
+    pool multiple handlers inside a single Lua file. Each call is passed a special table, called the
+    <a href="/api/request">request_rec</a>, which holds information about the request as well as contains the
+    built-in functions. The function can then manipulate the request and is expected to
+    return a HTTP status code or an internal status value back to mod_lua, which will determine the outcome of the request.
+</p>
+<p>An example mod_lua script could look like this:</p>
+<pre class="prettyprint lang-lua">
+function handle(r)
+    if r.uri == "/" then
+        r.content_type = "text/html"
+        r:write("Hello world! You've reached the top level folder of this domain")
+    end
+    return apache2.OK
+end
+</pre>
+
+<h4>Return values</h4>
+<p> Here are some of the standard return codes mod_lua expects to see from your Lua scripts: </p>
+<table class="table table-striped">
+    <tr><th>Return value</th><th>Description</th></tr>
+    <tr><td><code>apache2.OK</code></td><td>This is the standard return value, which means "we have handled this request, and everything went okay. You may proceed with serving the request/closing up"</td></tr>
+    <tr><td><code>apache2.DECLINED</code></td><td>This special value means that no request processing has taken place. It does <strong>not</strong> mean that the request is denied, but rather that our specific mod_lua script declined to handle it. It will be passed on to other hooks/handlers instead</td></tr>
+    <tr><td><code>apache2.DONE</code></td><td>This is another special value, which means "This request is DONE. Don't do any more processing of it, don't even log it in the access log. This can be used to terminate a request without resorting to returning an error to the client.</td></tr>
+    <tr><td><code>200</code></td><td>This is the standard "200 Okay" HTTP return code.</td></tr>
+    <tr><td><code>301</code></td><td>The HTTP status code for "Moved permanently". Use this to issue a permanent (cached) redirect</td></tr>
+    <tr><td><code>302</code></td><td>Like above, but only causes temporary redirects which will be re-evaluated upon each request.</td></tr>
+    <tr><td><code>401</code></td><td>"Authorization required". This is a useful return code for when working with, for instance, Basic Authorization</td></tr>
+    <tr><td><code>403</code></td><td>"Forbidden". This will tell the client that the resource is off access to it</td></tr>
+    <tr><td><code>404</code></td><td>"Not found". It's a 404, you know what it does!</td></tr>
+    <tr><td><code>500</code></td><td>Internal Server Error - return this code when stuff goes bad</td></tr>
+</table>
+
+<p>
+    <a href="/gs/installing" class="btn btn-large btn-primary">Next: compiling &amp; installing mod_lua</a> &nbsp;
+</p>

@@ -1,0 +1,55 @@
+Getting started with web apps
+<h2>Getting started with web apps</h2>
+<p>
+    To get started with writing web apps (think PHP, ASP etc), you'll need to tell httpd to regard
+    your scripts as Lua scripts. If we assume that your scripts all end with <code>.lua</code>, then you'll need
+    to add the following to your appropriate VirtualHost or global section:
+</p>
+
+<pre class="prettyprint lang-config">
+    &lt;Files *.lua&gt;
+        SetHandler lua-script
+    &lt;/Files&gt;
+</pre>
+
+<p>
+    This will tell httpd, that all of your .lua files will be treated as Lua scripts, and run through mod_lua.
+    The standard procedure for creating a new Lua script is to make a function called <code>handle</code>, which
+    gets passed a <a href="/api/request">request_rec</a> structure with all of mod_lua's internal variables and
+    <a href="/api/builtin">built-in functions</a>, and expects one of several return codes.
+    A boilerplate web app, which sets a content type and prints out something, could look like this:
+</p>
+
+<pre class="prettyprint lang-lua">
+function handle(r)
+    r.content_type = "text/html" -- set the output to text/html
+    r:puts("Hello world!")
+    return apache2.OK
+end
+</pre>
+
+<p>The return code, <code>apache2.OK</code> basically means "everything went okay, carry on". If you wish to return a specific
+HTTP status, you may do so by returning the integer value of that code, such as 404 for <code>Not found</code> or a 500 for <code>Internal Server Error</code>.</p>
+
+<p>
+    The entire Lua script will be parsed before the function is run, and as such, it is recommended that you include any external
+    libraries in the global scope:
+</p>
+
+<pre class="prettyprint lang-lua">
+local foo = require "foo"
+function handle(r)
+    r.content_type = "text/html" -- set the output to text/html
+    local form = r:parseargs() -- get some GET data
+    local name = form['name'] or "Anonymous"
+    r:puts("Hello ", name, "!")
+    return apache2.OK
+end
+</pre>
+
+<p>Some other topics you may find interesting:</p>
+<ul>
+    <li><a href="/api/builtin">Built-in functions</a></li>
+    <li><a href="/api/form">Working with form data</a></li>
+    <li><a href="/api/database">Database connectivity</a></li>
+</ul>
