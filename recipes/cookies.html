@@ -19,14 +19,14 @@ end
 
 <p>
     With the introduction of <a href="/api/builtin#getcookie">r:getcookie</a> and <a href="/api/builtin#setcookie">r:setcookie</a>
-    in the new 2.4.7 and further advancements in 2.4.8, working with cookies has gotten quite a bit easier:
+    in the new 2.4.7 and further advancements in 2.4.9, working with cookies has gotten quite a bit easier:
 </p>
 
 <pre class="prettyprint lang-lua">
 function handle(r)
     local cookie = r:getcookie("foo")
     if not cookie then
-        cookie = r:sha1(math.random(1, os.time()))
+        cookie = r:sha1(r.log_id .. r.clock())
         r:setcookie{
             key = "foo",
             value = cookie,
