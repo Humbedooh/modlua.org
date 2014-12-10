@@ -2674,7 +2674,7 @@ end
 <h4>Example:</h4>
 <pre class="prettyprint lang-lua">
 if r:wsupgrade() then
-    local line = r:wsread or "nothing"
+    local line = r:wsread() or "nothing"
     r:wswrite("You wrote: " .. line)
     r:wsclose()
 end
