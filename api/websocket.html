@@ -24,7 +24,7 @@ and sends back unmasked text frames for maximum browser compatibility.</p>
 -- First, try to upgrade the connection to WebSockets:
 if r:wsupgrade() then
     -- Then, we'll write something to the client:
-    r:wswrite("Hello, world! Please send me someting.")
+    r:wswrite("Hello, world! Please send me something.")
     
     -- Receive a line (frame) from the client:
     local line = r:wsread() or "nothing"
